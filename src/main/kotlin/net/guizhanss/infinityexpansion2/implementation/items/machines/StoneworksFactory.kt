@@ -2,6 +2,7 @@
 
 package net.guizhanss.infinityexpansion2.implementation.items.machines
 
+import io.github.seggan.sf4k.item.builder.asMaterialType
 import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup
 import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack
 import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType
@@ -9,14 +10,15 @@ import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset
+import net.guizhanss.guizhanlib.minecraft.utils.MinecraftVersionUtil
 import net.guizhanss.infinityexpansion2.InfinityExpansion2
 import net.guizhanss.infinityexpansion2.core.items.attributes.InformationalRecipeDisplayItem
 import net.guizhanss.infinityexpansion2.core.menu.MenuLayout
 import net.guizhanss.infinityexpansion2.implementation.items.machines.abstracts.AbstractTickingMachine
+import net.guizhanss.infinityexpansion2.utils.bukkitext.toItem
 import net.guizhanss.infinityexpansion2.utils.getString
 import net.guizhanss.infinityexpansion2.utils.hasData
 import net.guizhanss.infinityexpansion2.utils.items.GuiItems
-import net.guizhanss.infinityexpansion2.utils.items.MaterialType
 import net.guizhanss.infinityexpansion2.utils.setString
 import net.guizhanss.infinityexpansion2.utils.valueOfOrNull
 import org.bukkit.Material
@@ -69,7 +71,7 @@ class StoneworksFactory(
 
         val tick = InfinityExpansion2.sfTickCount() / getCustomTickRate() % (CHOICE_SLOTS.size + 1)
         if (tick == CHOICE_SLOTS.size) {
-            menu.pushItem(ItemStack(Material.COBBLESTONE, speed), ITEM_SLOTS[0])
+            menu.pushItem(Material.COBBLESTONE.toItem(speed), ITEM_SLOTS[0])
         } else {
             process(menu, tick)
         }
@@ -96,7 +98,7 @@ class StoneworksFactory(
         val nextSlot = ITEM_SLOTS.getOrElse(tick + 1) { layout.outputSlots[0] }
         val nextItem = menu.getItemInSlot(nextSlot)
         val choice = menu.getChoice(tick)
-        val targetItem = ItemStack(choice.map[currentItem.type] ?: currentItem.type, speed)
+        val targetItem = (choice.map[currentItem.type] ?: currentItem.type).toItem(speed)
         // check if the item in the next slot isn't empty and isn't the target item
         if (nextItem != null && !SlimefunUtils.isItemSimilar(nextItem, targetItem, false)) return
 
@@ -127,12 +129,8 @@ class StoneworksFactory(
             result.addAll(listOf(it.item, null))
 
             it.map.entries.forEach { (input, output) ->
-                result.addAll(
-                    listOf(
-                        ItemStack(input),
-                        ItemStack(output),
-                    )
-                )
+                result.add(input.toItem())
+                result.add(output.toItem())
             }
 
             result.addAll(listOf(null, null))
@@ -154,7 +152,7 @@ class StoneworksFactory(
         private val ITEM_SLOTS = intArrayOf(10, 12, 14)
 
         private val CHANGE_ITEM = InfinityExpansion2.localization.getGuiItem(
-            MaterialType.Material(Material.YELLOW_STAINED_GLASS_PANE),
+            Material.YELLOW_STAINED_GLASS_PANE.asMaterialType(),
             "sw_change"
         )
     }
@@ -187,16 +185,21 @@ class StoneworksFactory(
             )
         ),
         TRANSFORM(
-            Material.ANDESITE, mapOf(
-                Material.COBBLESTONE to Material.ANDESITE,
-                Material.ANDESITE to Material.DIORITE,
-                Material.DIORITE to Material.GRANITE,
-            )
+            Material.ANDESITE, buildMap {
+                put(Material.COBBLESTONE, Material.ANDESITE)
+                put(Material.ANDESITE, Material.DIORITE)
+                put(Material.DIORITE, Material.GRANITE)
+
+                if (MinecraftVersionUtil.isAtLeast(20)) {
+                    put(Material.SAND, Material.SUSPICIOUS_SAND)
+                    put(Material.GRAVEL, Material.SUSPICIOUS_GRAVEL)
+                }
+            }
         );
 
         val item: ItemStack
             get() = InfinityExpansion2.localization.getGuiItem(
-                MaterialType.Material(material),
+                material.asMaterialType(),
                 "sw_${name}"
             )
     }

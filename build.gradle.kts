@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("jvm") version "2.0.21"
-    id("com.gradleup.shadow") version "8.3.3"
+    id("com.gradleup.shadow") version "8.3.5"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
 }
@@ -30,15 +30,19 @@ repositories {
 }
 
 dependencies {
-    compileOnly(kotlin("stdlib")) // loaded during server startup
-    compileOnly(kotlin("reflect")) // loaded during server startup
+    compileOnly(kotlin("stdlib")) // loaded through library loader
+    compileOnly(kotlin("reflect")) // loaded through library loader
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    compileOnly("com.github.Slimefun:Slimefun4:e02a0f61d1")
+    compileOnly("com.github.Slimefun:Slimefun4:d12ae8580b")
     compileOnly("net.guizhanss:SlimefunTranslation:e03b01a7b7")
     compileOnly("com.github.schntgaispock:SlimeHUD:1.3.0")
-    implementation("net.byteflux:libby-bukkit:1.3.1")
-    implementation("net.guizhanss:guizhanlib-all:2.1.0")
+    implementation("net.guizhanss:guizhanlib-all:2.2.0-SNAPSHOT")
     implementation("org.bstats:bstats-bukkit:3.1.0")
+    implementation("it.unimi.dsi:fastutil:8.5.15")
+    implementation("io.github.seggan:sf4k:0.8.0") {
+        exclude(group = "org.jetbrains.kotlin")
+        exclude(group = "com.github.Slimefun")
+    }
 }
 
 java {
@@ -54,14 +58,17 @@ kotlin {
 }
 
 tasks.shadowJar {
-    fun doRelocate(from: String) {
-        val last = from.split(".").last()
+    fun doRelocate(from: String, to: String? = null) {
+        val last = to ?: from.split(".").last()
         relocate(from, "$mainPackage.libs.$last")
     }
 
     doRelocate("net.byteflux.libby")
     doRelocate("net.guizhanss.guizhanlib")
     doRelocate("org.bstats")
+    doRelocate("io.github.seggan.sf4k")
+    doRelocate("io.papermc.lib", "paperlib")
+    doRelocate("it.unimi.dsi.fastutil")
     minimize()
     archiveClassifier = ""
 }

@@ -9,7 +9,7 @@ import net.guizhanss.infinityexpansion2.utils.bukkitext.withAmount
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-class UraniumExtractor(
+class UraniumIngotExtractor(
     itemGroup: ItemGroup,
     itemStack: SlimefunItemStack,
     recipeType: RecipeType,
@@ -22,23 +22,23 @@ class UraniumExtractor(
     init {
         addRecipe(
             Material.COBBLESTONE.toItem(inputAmount),
-            SlimefunItems.SMALL_URANIUM.withAmount(outputAmount)
+            SlimefunItems.URANIUM.withAmount(outputAmount)
         )
         addRecipe(
             Material.STONE.toItem(inputAmount),
-            SlimefunItems.SMALL_URANIUM.withAmount(outputAmount)
+            SlimefunItems.URANIUM.withAmount(outputAmount)
         )
         addRecipe(
             Material.ANDESITE.toItem(inputAmount),
-            SlimefunItems.SMALL_URANIUM.withAmount(outputAmount)
+            SlimefunItems.URANIUM.withAmount(outputAmount)
         )
         addRecipe(
             Material.DIORITE.toItem(inputAmount),
-            SlimefunItems.SMALL_URANIUM.withAmount(outputAmount)
+            SlimefunItems.URANIUM.withAmount(outputAmount)
         )
         addRecipe(
             Material.GRANITE.toItem(inputAmount),
-            SlimefunItems.SMALL_URANIUM.withAmount(outputAmount)
+            SlimefunItems.URANIUM.withAmount(outputAmount)
         )
     }
 }
